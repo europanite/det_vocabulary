@@ -1,22 +1,12 @@
-# [Client Side Python](https://github.com/europanite/client_side_python "Client Side Python")
+# [DET Vocabular](https://github.com/europanite/det_vocabulary "DET Vocabulary")
 
-[![CI](https://github.com/europanite/client_side_python/actions/workflows/ci.yml/badge.svg)](https://github.com/europanite/client_side_python/actions/workflows/ci.yml)
-[![Frontend Tests via Docker](https://github.com/europanite/client_side_python/actions/workflows/docker.yml/badge.svg)](https://github.com/europanite/client_side_python/actions/workflows/docker.yml)
-[![Deploy Expo Web to GitHub Pages](https://github.com/europanite/client_side_python/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/europanite/client_side_python/actions/workflows/deploy-pages.yml)
-
-A Client-Side Browser-Based Python Playground. 
+A Duolingo English Test Vocabulary Section Playground.
 
 !["web_ui"](./assets/images/web_ui.png)
 
 ##  🚀 PlayGround
 
- [Client Side Python](https://europanite.github.io/client_side_python/)
-
----
-
-## 🧰 How It Works
-
-On first load, the app fetches Pyodide from CDN and exposes runPythonAsync to execute the code in the textbox. Output and errors are streamed to the in-page console. A soft “Stop” cancels by bumping an execution token. 
+ [DET Vocabular](https://europanite.github.io/det_vocabulary/)
 
 ---
 
