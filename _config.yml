@@ -1,6 +1,6 @@
-title: "client_side_python"
-description: "A Client Side Browser Based Python Playground"
-baseurl: "/client_side_python"
+title: "det_vocabulary"
+description: "A Duolingo English Test Vocabulary Section Playground."
+baseurl: "/det_vocabulary"
 url: "https://europanite.github.io"
 theme: minima
 markdown: kramdown
