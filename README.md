@@ -8,6 +8,8 @@ A Duolingo English Test Vocabulary Section Playground.
 
  [DET Vocabular](https://europanite.github.io/det_vocabulary/)
 
+Choose a real English words and press the "Check" button.
+
 ---
 
 ## 🚀 Getting Started
