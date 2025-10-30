@@ -1,4 +1,4 @@
-# [DET Vocabular](https://github.com/europanite/det_vocabulary "DET Vocabulary")
+# [DET Vocabulary](https://github.com/europanite/det_vocabulary "DET Vocabulary")
 
 A Duolingo English Test Vocabulary Section Playground.
 
@@ -6,7 +6,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
 ##  🚀 PlayGround
 
- [DET Vocabular](https://europanite.github.io/det_vocabulary/)
+ [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
 Choose a real English words and press the "Check" button.
 
