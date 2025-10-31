@@ -8,7 +8,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
  [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
-Choose a real English words and press the "Check" button.
+Choose real English words and press the "Check" button.
 
 ---
 
@@ -21,7 +21,7 @@ Choose a real English words and press the "Check" button.
 
 ```bash
 # set environment variables:
-export REACT_NATIVE_PACKAGER_HOSTNAME=${YOUR_HOST}
+export REACT_NATIVE_PACKAGER_HOSTNAME=192.168.3.6
 
 # Build the image
 docker compose build
