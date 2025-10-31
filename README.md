@@ -8,7 +8,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
  [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
-Choose a real English words and press the "Check" button.
+Choose real English words and press the "Check" button.
 
 ---
 
