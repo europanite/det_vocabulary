@@ -4,7 +4,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
 !["web_ui"](./assets/images/web_ui.png)
 
-## PlayGround💱
+## PlayGround
 
  [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
