@@ -4,7 +4,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
 !["web_ui"](./assets/images/web_ui.png)
 
-##  🚀 PlayGround
+## PlayGround💱
 
  [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
@@ -12,7 +12,7 @@ Choose real English words and press the "Check" button.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Prerequisites
 - [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
@@ -32,7 +32,10 @@ docker compose up
 
 ### 3. Test:
 ```bash
-docker compose -f docker-compose.test.yml up --build --exit-code-from frontend_test
+docker compose \
+-f docker-compose.test.yml \
+up --build --exit-code-from \
+frontend_test
 ```
 
 ---
