@@ -1,5 +1,9 @@
 # [DET Vocabulary](https://github.com/europanite/det_vocabulary "DET Vocabulary")
 
+[![CI](https://github.com/europanite/det_vocabulary/actions/workflows/ci.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/ci.yml)
+[![docker](https://github.com/europanite/det_vocabulary/actions/workflows/docker.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/docker.yml)
+[![GitHub Pages](https://github.com/europanite/det_vocabulary/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/deploy-pages.yml)
+
 A Duolingo English Test Vocabulary Section Playground.
 
 !["web_ui"](./assets/images/web_ui.png)
@@ -8,7 +12,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
  [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
-Choose real English words and press the "Check" button.
+Choose true English words and press the "Check" button.
 
 ---
 
