@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { View, Text, Pressable, useWindowDimensions, ScrollView } from "react-native";
+import { View, Text, Pressable, useWindowDimensions, ScrollView, TouchableOpacity } from "react-native";
 
 /**
  * DET Vocabulary Practice - HomeScreen
@@ -201,6 +201,8 @@ export default function HomeScreen() {
     return { backgroundColor: bg, borderColor: border, color: ink };
   }
 
+  const REPO_URL = "https://github.com/europanite/det_vocabulary";
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
       {/* Top bar */}
@@ -221,9 +223,20 @@ export default function HomeScreen() {
             gap: 8,
           }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "700", color: COLORS.ink }}>
-            DET Vocabulary Practice
-          </Text>
+          <TouchableOpacity onPress={() => Linking.openURL(REPO_URL)}>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "800",
+                marginBottom: 12,
+                color: "#1d4ed8",
+                textDecorationLine: "underline",
+              }}
+            >
+              DET Vocabulary Practice
+            </Text>
+          </TouchableOpacity>
+
           <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
             <ToolbarButton label="Check" onPress={onCheck} disabled={graded === true && timeLeft !== null && timeLeft > 0} />
             <ToolbarButton label="Reset" onPress={onReset} />
