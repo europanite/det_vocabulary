@@ -6,8 +6,8 @@
 
 A Duolingo English Test Vocabulary Section Playground.
 
-<!-- !["web_ui"](./assets/images/web_ui.png) -->
-!["phone_ui"](./assets/images/phone_ui.png)
+!["web_ui"](./assets/images/web_ui.png)
+<!-- !["phone_ui"](./assets/images/phone_ui.png) -->
 
 
 ## PlayGround
