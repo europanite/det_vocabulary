@@ -12,7 +12,7 @@ A Duolingo English Test Vocabulary Section Playground.
 
  [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
 
-Choose true English words and press the "Check" button.
+Select the real English words in this list.
 
 ---
 
