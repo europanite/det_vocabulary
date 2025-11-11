@@ -846,7 +846,7 @@ const HomeScreen: React.FC = () => {
               }}
             >
               {items.map((it) => {
-                
+
                 const style = chipStyle(it);
 
                 return (
@@ -854,7 +854,6 @@ const HomeScreen: React.FC = () => {
                     key={it.id}
                     onPress={() => toggleChoice(it.id)}
                     style={{
-                      width: 100,
                       paddingVertical: 10,
                       paddingHorizontal: 10,
                       borderRadius: 999,
