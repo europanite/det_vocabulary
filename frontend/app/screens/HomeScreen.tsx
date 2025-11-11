@@ -412,41 +412,102 @@ function buildProblemSet(size: number, difficulty: Difficulty): Item[] {
 /* -------------------------------------------------------------------------- */
 /* UI Components                                                               */
 /* -------------------------------------------------------------------------- */
+type ToolbarVariant = "primary" | "neutral" | "success" | "danger" | "warn" | "info";
 
 type ToolbarButtonProps = {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  variant?: ToolbarVariant;
 };
+
+function getToolbarColors(variant: ToolbarVariant, disabled?: boolean) {
+  if (disabled) {
+    return {
+      bg: "#e5e7eb",
+      border: COLORS.border,
+      text: COLORS.muted,
+    };
+  }
+
+  switch (variant) {
+    case "primary":
+      return {
+        bg: COLORS.primary,
+        border: "#dddadaff",
+        text: "#ffffff",
+      };
+    case "success":
+      return {
+        bg: COLORS.good,
+        border: "#dddadaff",
+        text: "#ffffff",
+      };
+    case "danger":
+      return {
+        bg: COLORS.bad,
+        border: "#dddadaff",
+        text: "#ffffff",
+      };
+    case "warn":
+      return {
+        bg: COLORS.warn,
+        border: "#dddadaff",
+        text: "#ffffff",
+      };
+    case "info":
+      return {
+        bg: "#38bdf8",
+        border: "#dddadaff",
+        text: "#0f172a",
+      };
+    case "neutral":
+    default:
+      return {
+        bg: "#f3f4f6",
+        border: COLORS.border,
+        text: COLORS.ink,
+      };
+  }
+}
 
 const ToolbarButton: React.FC<ToolbarButtonProps> = ({
   label,
   onPress,
   disabled,
-}) => (
-  <Pressable
-    onPress={disabled ? undefined : onPress}
-    style={{
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      borderRadius: 999,
-      borderWidth: 1,
-      borderColor: disabled ? COLORS.border : COLORS.primary,
-      backgroundColor: disabled ? "#e5e7eb" : "#ffffff",
-      opacity: disabled ? 0.6 : 1,
-    }}
-  >
-    <Text
+  variant = "primary",
+}) => {
+  const palette = getToolbarColors(variant, disabled);
+
+  return (
+    <Pressable
+      onPress={disabled ? undefined : onPress}
       style={{
-        color: disabled ? COLORS.muted : COLORS.primary,
-        fontSize: 12,
-        fontWeight: "600",
+        paddingHorizontal: 14,
+        paddingVertical: 9,
+        borderRadius: 999,
+        borderWidth: 1,
+        borderColor: palette.border,
+        backgroundColor: palette.bg,
+        opacity: disabled ? 0.5 : 1,
+        minWidth: 86,
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      {label}
-    </Text>
-  </Pressable>
-);
+      <Text
+        style={{
+          color: palette.text,
+          fontSize: 13,
+          fontWeight: "700",
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+};
+
 
 /* -------------------------------------------------------------------------- */
 /* Screen Component                                                            */
@@ -456,9 +517,9 @@ const HomeScreen: React.FC = () => {
   const { width } = useWindowDimensions();
 
   const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
-  const [size, setSize] = useState<number>(24);
+  const [size, setSize] = useState<number>(18);
   const [items, setItems] = useState<Item[]>(() =>
-    buildProblemSet(24, "mixed")
+    buildProblemSet(18, "mixed")
   );
   const [graded, setGraded] = useState<boolean>(false);
   const [score, setScore] = useState<Score>({
@@ -614,9 +675,9 @@ const HomeScreen: React.FC = () => {
   /* ----- Layout helpers ---------------------------------------------------- */
 
   const columns = useMemo(() => {
-    if (width >= 900) return 4;
-    if (width >= 600) return 3;
-    return 2;
+    if (width >= 900) return 6;
+    if (width >= 600) return 4;
+    return 3;
   }, [width]);
 
   function chipStyle(it: Item) {
@@ -706,36 +767,22 @@ const HomeScreen: React.FC = () => {
               label="Check"
               onPress={() => handleCheck(false)}
               disabled={graded && timeLeft !== null && timeLeft > 0}
+              variant="primary"
             />
-            <ToolbarButton label="Reset" onPress={handleReset} />
-            <ToolbarButton label="New set" onPress={handleNewSet} />
             <ToolbarButton
-              label={`Size: ${size}`}
-              onPress={() => {
-                const next = size === 24 ? 36 : size === 36 ? 48 : 24;
-                setSize(next);
-                const nextItems = buildProblemSet(next, difficulty);
-                setItems(nextItems);
-                setGraded(false);
-                setScore({
-                  correct: 0,
-                  total: nextItems.length,
-                  tp: 0,
-                  fp: 0,
-                  fn: 0,
-                  tn: 0,
-                });
-                if (timeLeft !== null) setTimeLeft(60);
-              }}
+              label="Reset"
+              onPress={handleReset}
+              variant="neutral"
             />
-            <ToolbarButton label={difficultyLabel} onPress={cycleDifficulty} />
             <ToolbarButton
-              label={
-                timeLeft === null
-                  ? "Timer: Off"
-                  : `Timer: ${timeLeft}s`
-              }
+              label="New set"
+              onPress={handleNewSet}
+              variant="success"
+            />
+            <ToolbarButton
+              label={timeLeft === null ? "Timer: Off" : `Timer: ${timeLeft}s`}
               onPress={startStopTimer}
+              variant="warn"
             />
           </View>
 
@@ -752,7 +799,7 @@ const HomeScreen: React.FC = () => {
               <Text style={{ color: COLORS.ink }}>
                 {graded
                   ? `Score: ${score.correct}/${score.total}`
-                  : "Tap the words you believe are REAL English words."}
+                  : "Select the real English words in this list"}
               </Text>
             )}
             {graded && !noData && (
@@ -800,7 +847,7 @@ const HomeScreen: React.FC = () => {
             >
               {items.map((it) => {
                 const style = chipStyle(it);
-                const basis = `${100 / columns - 2}%` as `${number}%`; // ← 型を絞る
+                const basis = `${100 / columns - 2}%` as `${number}%`;
 
                 return (
                   <Pressable
