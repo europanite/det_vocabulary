@@ -6,7 +6,8 @@ import {
   useWindowDimensions, 
   ScrollView,
   TouchableOpacity,
-  Linking } from "react-native";
+  Linking 
+} from "react-native";
 
 /**
  * DET Vocabulary Practice - HomeScreen
