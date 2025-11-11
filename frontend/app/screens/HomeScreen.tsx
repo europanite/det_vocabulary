@@ -846,8 +846,8 @@ const HomeScreen: React.FC = () => {
               }}
             >
               {items.map((it) => {
+
                 const style = chipStyle(it);
-                const basis = `${100 / columns - 2}%` as `${number}%`;
 
                 return (
                   <Pressable
@@ -861,8 +861,6 @@ const HomeScreen: React.FC = () => {
                       borderColor: style.borderColor,
                       backgroundColor: style.backgroundColor,
                       minWidth: 0,
-                      flexGrow: 1,
-                      flexBasis: basis,
                     }}
                   >
                     <Text
