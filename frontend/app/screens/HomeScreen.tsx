@@ -657,9 +657,7 @@ const HomeScreen: React.FC = () => {
       : `Diff: ${difficulty[0].toUpperCase()}${difficulty.slice(1)}`;
 
   /* ----- Render ------------------------------------------------------------ */
-
   const noData = items.length === 0;
-
   const REPO_URL = "https://github.com/europanite/det_vocabulary";
 
   return (
