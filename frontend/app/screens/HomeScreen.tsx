@@ -789,7 +789,7 @@ const HomeScreen: React.FC = () => {
                 marginTop: 24,
               }}
             >
-              This game depends on the "popular-english-words" package.
+              This service depends on the "popular-english-words" package.
               Install it in your project to generate DET-style word sets.
             </Text>
           ) : (
@@ -802,7 +802,8 @@ const HomeScreen: React.FC = () => {
             >
               {items.map((it) => {
                 const style = chipStyle(it);
-                const basis = `${100 / columns - 2}%`;
+                const basis = `${100 / columns - 2}%` as `${number}%`; // ← 型を絞る
+
                 return (
                   <Pressable
                     key={it.id}
