@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, Pressable, useWindowDimensions, ScrollView } from "react-native";
+import { View, Text, Pressable, useWindowDimensions, ScrollView,TouchableOpacity } from "react-native";
 
 /**
  * DET Vocabulary Practice - HomeScreen
