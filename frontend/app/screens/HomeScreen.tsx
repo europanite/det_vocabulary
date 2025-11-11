@@ -652,6 +652,8 @@ const HomeScreen: React.FC = () => {
 
   const noData = items.length === 0;
 
+  const REPO_URL = "https://github.com/europanite/det_vocabulary";
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
       {/* Top bar */}
@@ -672,10 +674,19 @@ const HomeScreen: React.FC = () => {
             gap: 8,
           }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "700", color: COLORS.ink }}>
-            DET Vocabulary Practice
-          </Text>
-
+          <TouchableOpacity onPress={() => Linking.openURL(REPO_URL)}>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "800",
+                marginBottom: 12,
+                color: "#1d4ed8",
+                textDecorationLine: "underline",
+              }}
+            >
+              DET Vocabulary Practice
+            </Text>
+          </TouchableOpacity>
           {/* Toolbar */}
           <View
             style={{
