@@ -847,33 +847,35 @@ const HomeScreen: React.FC = () => {
             >
               {items.map((it) => {
                 const style = chipStyle(it);
-                const basis = `${100 / columns - 2}%` as `${number}%`;
+
+                // columns :6 / Tablets:4 / Phones:3）
+                const chipWidth = `${100 / columns - 2}%` as `${number}%`;
 
                 return (
                   <Pressable
                     key={it.id}
                     onPress={() => toggleChoice(it.id)}
                     style={{
-                      width: 100,
-                      paddingVertical: 10,
-                      paddingHorizontal: 10,
-                      borderRadius: 999,
+                      width: chipWidth,
+                      paddingVertical: 8,
+                      paddingHorizontal: 6,
+                      borderRadius: 8,
                       borderWidth: 1,
                       borderColor: style.borderColor,
                       backgroundColor: style.backgroundColor,
-                      minWidth: 0,
-                      flexBasis: basis,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minHeight: 32,
                     }}
                   >
                     <Text
                       style={{
                         color: style.color,
-                        fontSize: 14,
+                        fontSize: 12,
                         textAlign: "center",
-                        fontWeight: "500",
+                        flexShrink: 1,
+                        flexWrap: "wrap",
                       }}
-                      numberOfLines={1}
-                      ellipsizeMode="clip"
                     >
                       {it.text}
                     </Text>
