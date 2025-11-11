@@ -846,14 +846,15 @@ const HomeScreen: React.FC = () => {
               }}
             >
               {items.map((it) => {
-
                 const style = chipStyle(it);
+                const basis = `${100 / columns - 2}%` as `${number}%`;
 
                 return (
                   <Pressable
                     key={it.id}
                     onPress={() => toggleChoice(it.id)}
                     style={{
+                      width: 100,
                       paddingVertical: 10,
                       paddingHorizontal: 10,
                       borderRadius: 999,
@@ -861,6 +862,7 @@ const HomeScreen: React.FC = () => {
                       borderColor: style.borderColor,
                       backgroundColor: style.backgroundColor,
                       minWidth: 0,
+                      flexBasis: basis,
                     }}
                   >
                     <Text
