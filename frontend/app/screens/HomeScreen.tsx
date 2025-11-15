@@ -9,22 +9,6 @@ import {
   Linking 
 } from "react-native";
 
-/**
- * DET Vocabulary Practice - HomeScreen
- *
- * - Tap the chips you believe are REAL English words.
- * - "Check": grade your choices (TP / FP / FN / TN).
- * - "New set": randomize a new problem set.
- * - "Reset": clear selections for the current set.
- * - Optional 60s timer for exam-like pacing.
- *
- * Data source:
- * - Uses `popular-english-words` as the single vocabulary source.
- * - Difficulty tiers are defined by frequency rank.
- * - Pseudo-words are generated algorithmically from real words.
- * - No hard-coded emergency word lists are used.
- */
-
 /* -------------------------------------------------------------------------- */
 /* Types                                                                       */
 /* -------------------------------------------------------------------------- */
@@ -69,14 +53,13 @@ const CONTENT_MAX_W = 720;
 /* Wiring: popular-english-words                                              */
 /* -------------------------------------------------------------------------- */
 
+/* -------------------------------------------------------------------------- */
+/* Wiring: popular-english-words                                              */
+/* -------------------------------------------------------------------------- */
+
 /**
  * We support several possible shapes of the `popular-english-words` export
- * so that Metro / Jest / bundlers do not break even if the package structure
- * changes slightly.
- *
- * Expected semantics:
- * - A long list of English words sorted by popularity (most frequent first).
- * - We only need "enough" words; upper bound is capped defensively.
+ * ...
  */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,8 +67,7 @@ const popularWordsModule: any = safeRequirePopularEnglishWords();
 
 /**
  * Try to require the module safely.
- * If it is not available (e.g. local dev without npm install),
- * we return null and handle that gracefully in the UI.
+ * ...
  */
 function safeRequirePopularEnglishWords(): unknown {
   try {
@@ -99,12 +81,7 @@ function safeRequirePopularEnglishWords(): unknown {
 
 /**
  * Extract a flat word list from the module in a robust way.
- *
- * Handles:
- * - direct array export
- * - { words: { getAll() / getMostPopular(n) } }
- * - { getAll() / getMostPopular(n) }
- * - or a `words` array.
+ * ...
  */
 function getBaseWordListFromModule(limit = 50000): string[] {
   const mod = popularWordsModule;
@@ -115,6 +92,102 @@ function getBaseWordListFromModule(limit = 50000): string[] {
     return mod
       .filter((w) => typeof w === "string")
       .slice(0, limit);
+  }
+
+  // 2) Nested `words` helper object
+  if (mod.words) {
+    ...
+  }
+
+  // 3) Top-level helpers
+  if (typeof mod.getAll === "function") {
+    ...
+  }
+
+  if (typeof mod.getMostPopular === "function") {
+    ...
+  }
+
+  return [];
+}
+ここを 丸ごと削除 して、次のブロックを貼ってください（コメント含めて全部英語）：
+
+ts
+コードをコピーする
+/* -------------------------------------------------------------------------- */
+/* Wiring: subtlex-word-frequencies (SUBTLEXus)                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * We support several possible shapes of the `subtlex-word-frequencies` export
+ * so that Metro / Jest / bundlers do not break even if the package structure
+ * changes slightly.
+ *
+ * Expected semantics:
+ * - A long list of English words sorted by frequency (most frequent first).
+ * - We only need "enough" words; the upper bound is capped defensively.
+ */
+
+type SubtlexEntry = {
+  word: string;
+  value?: number;
+  count?: number;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const subtlexModule: any = safeRequireSubtlexWordFrequencies();
+
+/**
+ * Try to require the module safely.
+ * If it is not available (e.g. local dev without npm install),
+ * we return null and handle that gracefully in the UI.
+ */
+function safeRequireSubtlexWordFrequencies(): unknown {
+  try {
+    // CommonJS require is friendlier to Metro / Jest in this setup.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require("subtlex-word-frequencies");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Extract a flat word list from the module in a robust way.
+ *
+ * Handles:
+ * - direct array export (string[])
+ * - direct array export of { word, value/count } (SUBTLEXus shape)
+ * - { words: { getAll() / getMostPopular(n) } }
+ * - { getAll() / getMostPopular(n) }
+ * - or a `words` array.
+ */
+function getBaseWordListFromModule(limit = 50000): string[] {
+  const raw = subtlexModule;
+  if (!raw) return [];
+
+  const mod: any = (raw as any).default ?? raw;
+
+  // 1) Direct array export
+  if (Array.isArray(mod)) {
+    if (mod.length === 0) return [];
+
+    const first = mod[0];
+
+    // 1a) Array of strings
+    if (typeof first === "string") {
+      return (mod as string[])
+        .filter((w) => typeof w === "string")
+        .slice(0, limit);
+    }
+
+    // 1b) Array of objects with a `word` field (SUBTLEXus)
+    if (first && typeof first === "object" && "word" in (first as any)) {
+      return (mod as SubtlexEntry[])
+        .map((entry) => entry.word)
+        .filter((w) => typeof w === "string")
+        .slice(0, limit);
+    }
   }
 
   // 2) Nested `words` helper object
@@ -166,7 +239,7 @@ function getBaseWordListFromModule(limit = 50000): string[] {
 
 /**
  * Canonical word list:
- * - based solely on `popular-english-words`.
+ * - based solely on `subtlex-word-frequencies`.
  * - lowercased, alphabetic only, length >= 3.
  * - deduplicated.
  */

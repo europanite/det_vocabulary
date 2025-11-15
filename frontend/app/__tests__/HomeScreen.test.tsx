@@ -33,13 +33,12 @@ const MOCK_VOCAB = [
   "family",
 ];
 
-jest.mock("popular-english-words", () => ({
-  // HomeScreen#getBaseWordListFromModule
-  getAll: () => MOCK_VOCAB,
-  words: {
-    getAll: () => MOCK_VOCAB,
-  },
-}));
+jest.mock("subtlex-word-frequencies", () =>
+  MOCK_VOCAB.map((w, index) => ({
+    word: w,
+    value: MOCK_VOCAB.length - index, // higher for more frequent
+  }))
+);
 
 /**
  * Deterministic Math.random
