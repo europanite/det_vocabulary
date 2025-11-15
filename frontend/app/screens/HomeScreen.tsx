@@ -53,81 +53,6 @@ const CONTENT_MAX_W = 720;
 /* Wiring: popular-english-words                                              */
 /* -------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------- */
-/* Wiring: popular-english-words                                              */
-/* -------------------------------------------------------------------------- */
-
-/**
- * We support several possible shapes of the `popular-english-words` export
- * ...
- */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const popularWordsModule: any = safeRequirePopularEnglishWords();
-
-/**
- * Try to require the module safely.
- * ...
- */
-function safeRequirePopularEnglishWords(): unknown {
-  try {
-    // CommonJS require is friendlier to Metro / Jest in this setup.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require("popular-english-words");
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Extract a flat word list from the module in a robust way.
- * ...
- */
-function getBaseWordListFromModule(limit = 50000): string[] {
-  const mod = popularWordsModule;
-  if (!mod) return [];
-
-  // 1) Direct array export
-  if (Array.isArray(mod)) {
-    return mod
-      .filter((w) => typeof w === "string")
-      .slice(0, limit);
-  }
-
-  // 2) Nested `words` helper object
-  if (mod.words) {
-    ...
-  }
-
-  // 3) Top-level helpers
-  if (typeof mod.getAll === "function") {
-    ...
-  }
-
-  if (typeof mod.getMostPopular === "function") {
-    ...
-  }
-
-  return [];
-}
-ここを 丸ごと削除 して、次のブロックを貼ってください（コメント含めて全部英語）：
-
-ts
-コードをコピーする
-/* -------------------------------------------------------------------------- */
-/* Wiring: subtlex-word-frequencies (SUBTLEXus)                               */
-/* -------------------------------------------------------------------------- */
-
-/**
- * We support several possible shapes of the `subtlex-word-frequencies` export
- * so that Metro / Jest / bundlers do not break even if the package structure
- * changes slightly.
- *
- * Expected semantics:
- * - A long list of English words sorted by frequency (most frequent first).
- * - We only need "enough" words; the upper bound is capped defensively.
- */
-
 type SubtlexEntry = {
   word: string;
   value?: number;
@@ -137,11 +62,6 @@ type SubtlexEntry = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const subtlexModule: any = safeRequireSubtlexWordFrequencies();
 
-/**
- * Try to require the module safely.
- * If it is not available (e.g. local dev without npm install),
- * we return null and handle that gracefully in the UI.
- */
 function safeRequireSubtlexWordFrequencies(): unknown {
   try {
     // CommonJS require is friendlier to Metro / Jest in this setup.
@@ -239,7 +159,7 @@ function getBaseWordListFromModule(limit = 50000): string[] {
 
 /**
  * Canonical word list:
- * - based solely on `subtlex-word-frequencies`.
+ * - based solely on `popular-english-words`.
  * - lowercased, alphabetic only, length >= 3.
  * - deduplicated.
  */
