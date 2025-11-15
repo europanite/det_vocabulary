@@ -9,22 +9,6 @@ import {
   Linking 
 } from "react-native";
 
-/**
- * DET Vocabulary Practice - HomeScreen
- *
- * - Tap the chips you believe are REAL English words.
- * - "Check": grade your choices (TP / FP / FN / TN).
- * - "New set": randomize a new problem set.
- * - "Reset": clear selections for the current set.
- * - Optional 60s timer for exam-like pacing.
- *
- * Data source:
- * - Uses `popular-english-words` as the single vocabulary source.
- * - Difficulty tiers are defined by frequency rank.
- * - Pseudo-words are generated algorithmically from real words.
- * - No hard-coded emergency word lists are used.
- */
-
 /* -------------------------------------------------------------------------- */
 /* Types                                                                       */
 /* -------------------------------------------------------------------------- */
@@ -69,129 +53,159 @@ const CONTENT_MAX_W = 720;
 /* Wiring: popular-english-words                                              */
 /* -------------------------------------------------------------------------- */
 
-/**
- * We support several possible shapes of the `popular-english-words` export
- * so that Metro / Jest / bundlers do not break even if the package structure
- * changes slightly.
- *
- * Expected semantics:
- * - A long list of English words sorted by popularity (most frequent first).
- * - We only need "enough" words; upper bound is capped defensively.
- */
+// --- Wiring: subtlex-word-frequencies (lazy + defensive) -------------
 
+const WORD_LIST_LIMIT = 50000;
+
+// Lazily require the module so Jest mocks are applied *before* we load it.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const popularWordsModule: any = safeRequirePopularEnglishWords();
-
-/**
- * Try to require the module safely.
- * If it is not available (e.g. local dev without npm install),
- * we return null and handle that gracefully in the UI.
- */
-function safeRequirePopularEnglishWords(): unknown {
+function loadWordListModule(): any | null {
   try {
-    // CommonJS require is friendlier to Metro / Jest in this setup.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require("popular-english-words");
-  } catch {
+    return require("subtlex-word-frequencies");
+  } catch (_err) {
     return null;
   }
 }
 
 /**
- * Extract a flat word list from the module in a robust way.
- *
- * Handles:
- * - direct array export
- * - { words: { getAll() / getMostPopular(n) } }
- * - { getAll() / getMostPopular(n) }
- * - or a `words` array.
+ * Normalize a raw word into a canonical lowercase form.
+ * You should already have this function below in your file;
+ * if not, keep this implementation.
  */
-function getBaseWordListFromModule(limit = 50000): string[] {
-  const mod = popularWordsModule;
-  if (!mod) return [];
+function normalizeWord(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    // strip simple punctuation at the edges
+    .replace(/^[^a-z]+|[^a-z]+$/g, "");
+}
 
-  // 1) Direct array export
-  if (Array.isArray(mod)) {
-    return mod
-      .filter((w) => typeof w === "string")
-      .slice(0, limit);
+/**
+ * Filter out weird candidates:
+ * - too short
+ * - contains digits
+ * - contains spaces or obvious punctuation
+ */
+function isGoodCandidateWord(w: string): boolean {
+  if (!w) return false;
+  if (w.length < 3) return false;
+  if (!/^[a-z]+$/.test(w)) return false;
+  return true;
+}
+
+/**
+ * Convert whatever the module exports into a simple string[].
+ * Supports:
+ *   - string[]
+ *   - { word: string }[]
+ *   - { words: string[] }
+ *   - { words: { getAll(): string[] } }
+ *   - { getAll(): string[] }
+ *   - { getMostPopular(n): string[] }
+ */
+function getBaseWordListFromModule(limit: number = WORD_LIST_LIMIT): string[] {
+  const raw = loadWordListModule();
+  if (!raw) {
+    return [];
   }
 
-  // 2) Nested `words` helper object
-  if (mod.words) {
-    const w = mod.words;
+  // Handle both CJS and ESM default exports
+  const mod: any = (raw as any).default ?? raw;
 
-    if (typeof w.getAll === "function") {
-      const all = w.getAll();
+  // 1) Direct array export – either string[] or { word: string; ... }[]
+  if (Array.isArray(mod)) {
+    if (mod.length === 0) return [];
+
+    const first = mod[0];
+
+    // Case: string[]
+    if (typeof first === "string") {
+      return (mod as unknown[])
+        .filter((w): w is string => typeof w === "string")
+        .slice(0, limit);
+    }
+
+    // Case: array of objects with `.word`
+    if (first && typeof first === "object" && "word" in first) {
+      return (mod as any[])
+        .map((entry) =>
+          entry && typeof entry.word === "string" ? entry.word : null
+        )
+        .filter((w: string | null): w is string => !!w)
+        .slice(0, limit);
+    }
+  }
+
+  // 2) Objects like { words: string[] } or { words: { getAll(): string[] } }
+  if (mod && typeof mod === "object" && "words" in mod) {
+    const wordsSection = (mod as any).words;
+
+    if (Array.isArray(wordsSection)) {
+      return wordsSection
+        .filter((w: unknown): w is string => typeof w === "string")
+        .slice(0, limit);
+    }
+
+    if (wordsSection && typeof wordsSection.getAll === "function") {
+      const all = wordsSection.getAll();
       if (Array.isArray(all)) {
         return all
-          .filter((s: unknown) => typeof s === "string")
+          .filter((w: unknown): w is string => typeof w === "string")
           .slice(0, limit);
       }
     }
 
-    if (typeof w.getMostPopular === "function") {
-      const top = w.getMostPopular(limit);
-      if (Array.isArray(top)) {
-        return top.filter((s: unknown) => typeof s === "string");
+    if (wordsSection && typeof wordsSection.getMostPopular === "function") {
+      const popular = wordsSection.getMostPopular(limit);
+      if (Array.isArray(popular)) {
+        return popular
+          .filter((w: unknown): w is string => typeof w === "string")
+          .slice(0, limit);
+      }
+    }
+  }
+
+  // 3) Objects like { getAll(): string[] } / { getMostPopular(n): string[] }
+  if (mod && typeof mod === "object") {
+    if (typeof (mod as any).getAll === "function") {
+      const all = (mod as any).getAll();
+      if (Array.isArray(all)) {
+        return all
+          .filter((w: unknown): w is string => typeof w === "string")
+          .slice(0, limit);
       }
     }
 
-    if (Array.isArray(w)) {
-      return w
-        .filter((s: unknown) => typeof s === "string")
-        .slice(0, limit);
-    }
-  }
-
-  // 3) Top-level helpers
-  if (typeof mod.getAll === "function") {
-    const all = mod.getAll();
-    if (Array.isArray(all)) {
-      return all
-        .filter((s: unknown) => typeof s === "string")
-        .slice(0, limit);
-    }
-  }
-
-  if (typeof mod.getMostPopular === "function") {
-    const top = mod.getMostPopular(limit);
-    if (Array.isArray(top)) {
-      return top.filter((s: unknown) => typeof s === "string");
+    if (typeof (mod as any).getMostPopular === "function") {
+      const popular = (mod as any).getMostPopular(limit);
+      if (Array.isArray(popular)) {
+        return popular
+          .filter((w: unknown): w is string => typeof w === "string")
+          .slice(0, limit);
+      }
     }
   }
 
   return [];
 }
 
-/**
- * Canonical word list:
- * - based solely on `popular-english-words`.
- * - lowercased, alphabetic only, length >= 3.
- * - deduplicated.
- */
+let cachedCanonicalWordList: string[] | null = null;
+
 function getCanonicalWordList(): string[] {
-  const base = getBaseWordListFromModule(50000);
-  if (!base || base.length === 0) {
-    return [];
+  if (cachedCanonicalWordList) {
+    return cachedCanonicalWordList;
   }
 
-  const seen = new Set<string>();
-  const cleaned: string[] = [];
+  const baseList = getBaseWordListFromModule();
 
-  for (const raw of base) {
-    if (typeof raw !== "string") continue;
-    const w = raw.trim().toLowerCase();
+  const cleaned = baseList
+    .map((w) => normalizeWord(w))
+    .filter((w) => isGoodCandidateWord(w));
 
-    if (w.length < 3) continue;
-    if (!/^[a-z]+$/.test(w)) continue;
-    if (!seen.has(w)) {
-      seen.add(w);
-      cleaned.push(w);
-    }
-  }
+  cachedCanonicalWordList = Array.from(new Set(cleaned));
 
-  return cleaned;
+  return cachedCanonicalWordList;
 }
 
 /* -------------------------------------------------------------------------- */
