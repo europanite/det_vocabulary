@@ -8,6 +8,54 @@ import HomeScreen from "../screens/HomeScreen";
 
 jest.setTimeout(15000);
 
+
+// Common English derivational prefixes / suffixes for pseudo-morphology
+const COMMON_PREFIXES = [
+  "un", "re", "dis", "mis", "non",
+  "over", "under", "pre", "post",
+  "sub", "inter", "super", "semi",
+  "anti", "counter", "co", "de",
+];
+
+const COMMON_SUFFIXES = [
+  "ing", "ed", "er", "est",
+  "ness", "less", "ful",
+  "able", "ible",
+  "ment", "tion", "sion",
+  "al", "ous", "ish",
+  "ism", "ist",
+  "ize", "ise",
+  "ly",
+];
+
+/**
+ * Very small heuristic "morphological" splitter.
+ * Tries to separate a known suffix and return STEM + SUFFIX.
+ * This is *not* a real morphological analyzer, but good enough for pseudo-words.
+ */
+function guessStemAndSuffix(
+  raw: string
+): { stem: string; suffix: string | null } {
+  const word = normalizeWord(raw);
+
+  // longest suffix first to avoid cutting "tion" as "on"
+  const sortedSuffixes = [...COMMON_SUFFIXES].sort(
+    (a, b) => b.length - a.length
+  );
+
+  for (const suf of sortedSuffixes) {
+    if (word.length - suf.length < 3) continue; // keep a minimum stem length
+    if (word.endsWith(suf)) {
+      return {
+        stem: word.slice(0, word.length - suf.length),
+        suffix: suf,
+      };
+    }
+  }
+
+  return { stem: word, suffix: null };
+}
+
 /**
  * Deterministic mock for `popular-english-words`.
  * HomeScreen expects a long-ish frequency-sorted word list.

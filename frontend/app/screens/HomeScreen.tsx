@@ -475,6 +475,129 @@ function makeBlendedPseudoWordFromPool(
   return null;
 }
 
+// Common English derivational prefixes / suffixes for pseudo-morphology
+const COMMON_PREFIXES = [
+  "un", "re", "dis", "mis", "non",
+  "over", "under", "pre", "post",
+  "sub", "inter", "super", "semi",
+  "anti", "counter", "co", "de",
+];
+
+const COMMON_SUFFIXES = [
+  "ing", "ed", "er", "est",
+  "ness", "less", "ful",
+  "able", "ible",
+  "ment", "tion", "sion",
+  "al", "ous", "ish",
+  "ism", "ist",
+  "ize", "ise",
+  "ly",
+];
+
+/**
+ * Very small heuristic "morphological" splitter.
+ * Tries to separate a known suffix and return STEM + SUFFIX.
+ * This is *not* a real morphological analyzer, but good enough for pseudo-words.
+ */
+function guessStemAndSuffix(
+  raw: string
+): { stem: string; suffix: string | null } {
+  const word = normalizeWord(raw);
+
+  // longest suffix first to avoid cutting "tion" as "on"
+  const sortedSuffixes = [...COMMON_SUFFIXES].sort(
+    (a, b) => b.length - a.length
+  );
+
+  for (const suf of sortedSuffixes) {
+    if (word.length - suf.length < 3) continue; // keep a minimum stem length
+    if (word.endsWith(suf)) {
+      return {
+        stem: word.slice(0, word.length - suf.length),
+        suffix: suf,
+      };
+    }
+  }
+
+  return { stem: word, suffix: null };
+}
+
+/**
+ * Generate a pseudo-word by manipulating prefixes / suffixes.
+ *
+ * Strategies (randomly chosen):
+ *  - add a new prefix (e.g., "re" + "start" -> "restart" / "restarn")
+ *  - add a new suffix (e.g., "friend" + "less" -> "friendless"-like)
+ *  - swap the suffix (e.g., "happiness" -> "happiment")
+ *
+ * Notes:
+ *  - Uses a very light-weight "morphological" heuristic via guessStemAndSuffix.
+ *  - Ensures the result is not a real word and looks word-like.
+ */
+function makeAffixPseudoWordFromPool(
+  pool: string[],
+  dictionary: Set<string>,
+  maxTries = 16
+): string | null {
+  if (pool.length === 0) return null;
+
+  for (let attempt = 0; attempt < maxTries; attempt += 1) {
+    const baseRaw = pool[Math.floor(Math.random() * pool.length)];
+    const base = normalizeWord(baseRaw);
+    if (!isGoodCandidateWord(base)) continue;
+
+    const { stem: baseStem, suffix: baseSuffix } = guessStemAndSuffix(base);
+    if (!isGoodCandidateWord(baseStem)) continue;
+
+    let candidate: string | null = null;
+    const op = Math.random();
+
+    if (op < 0.33) {
+      // 1) Add or swap a prefix
+      const prefix =
+        COMMON_PREFIXES[Math.floor(Math.random() * COMMON_PREFIXES.length)];
+      // avoid double prefix like "repre..."
+      const core = base.startsWith(prefix) ? baseStem : base;
+      candidate = (prefix + core).toLowerCase();
+    } else if (op < 0.66) {
+      // 2) Add a new suffix to the whole base
+      const suffix =
+        COMMON_SUFFIXES[Math.floor(Math.random() * COMMON_SUFFIXES.length)];
+      if (base.endsWith(suffix)) {
+        // if already has this suffix, skip this attempt
+        continue;
+      }
+      candidate = (base + suffix).toLowerCase();
+    } else {
+      // 3) Swap suffix: (stem + newSuffix)
+      if (!baseSuffix) {
+        // no recognizable suffix → fake one by using the stem directly
+        continue;
+      }
+
+      const otherSuffixes = COMMON_SUFFIXES.filter((s) => s !== baseSuffix);
+      if (otherSuffixes.length === 0) continue;
+
+      const newSuffix =
+        otherSuffixes[Math.floor(Math.random() * otherSuffixes.length)];
+      candidate = (baseStem + newSuffix).toLowerCase();
+    }
+
+    if (!candidate) continue;
+
+    // Basic filters (similar to other generators)
+    if (candidate.length < 4) continue;
+    if (!/[aeiou]/.test(candidate)) continue; // must contain a vowel
+    if (!/^[a-z]+$/.test(candidate)) continue;
+    if (candidate === base || candidate === baseStem) continue;
+    if (dictionary.has(candidate)) continue;
+
+    return candidate;
+  }
+
+  return null;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Problem set generation                                                      */
 /* -------------------------------------------------------------------------- */
@@ -521,10 +644,16 @@ function buildProblemSet(size: number, difficulty: Difficulty): Item[] {
 
     let candidate: string | null = null;
 
-    // Prefer DET-like blends most of the time,
-    // but occasionally fall back to single-word mutation
-    if (Math.random() < 0.7) {
+    // Choose which pseudo-word generator to use:
+    //  - ~40%: blended pseudo words (two-word blend)
+    //  - ~30%: affix-based pseudo words (prefix/suffix play)
+    //  - ~30%: single-word character mutation
+    const mode = Math.random();
+
+    if (mode < 0.4) {
       candidate = makeBlendedPseudoWordFromPool(pseudoSource, dictionary);
+    } else if (mode < 0.7) {
+      candidate = makeAffixPseudoWordFromPool(pseudoSource, dictionary);
     } else {
       const src =
         pseudoSource[Math.floor(Math.random() * pseudoSource.length)];
