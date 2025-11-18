@@ -351,6 +351,130 @@ function makePseudoWord(
   return null;
 }
 
+/**
+ * Generate a plausible pseudo-word by mutating a single real word.
+ * - Only a-z
+ * - 1 mutation step (sub / ins / del)
+ * - Not equal to original
+ * - Not present in dictionary
+ */
+function makeMutatedPseudoWord(
+  base: string,
+  dictionary: Set<string>,
+  maxTries = 8
+): string | null {
+  const vowels = ["a", "e", "i", "o", "u"];
+  const consonants = [
+    "b","c","d","f","g","h","j","k","l","m",
+    "n","p","q","r","s","t","v","w","x","y","z",
+  ];
+
+  const clean = base.toLowerCase().replace(/[^a-z]/g, "");
+  if (clean.length < 3) return null;
+
+  for (let attempt = 0; attempt < maxTries; attempt += 1) {
+    let chars = clean.split("");
+    const op = Math.floor(Math.random() * 3);
+
+    if (op === 0) {
+      // substitution
+      const i = Math.floor(Math.random() * chars.length);
+      const src = chars[i];
+      const pool = /[aeiou]/.test(src) ? vowels : consonants;
+      const replacement = pool[Math.floor(Math.random() * pool.length)];
+      chars[i] = replacement;
+    } else if (op === 1) {
+      // insertion
+      const i = Math.floor(Math.random() * (chars.length + 1));
+      const pool = Math.random() < 0.4 ? vowels : consonants;
+      const ch = pool[Math.floor(Math.random() * pool.length)];
+      chars = [...chars.slice(0, i), ch, ...chars.slice(i)];
+    } else {
+      // deletion
+      if (chars.length > 4) {
+        const i = Math.floor(Math.random() * chars.length);
+        chars.splice(i, 1);
+      } else {
+        // fallback to substitution for very short words
+        const j = Math.floor(Math.random() * chars.length);
+        const pool = vowels.concat(consonants);
+        chars[j] = pool[Math.floor(Math.random() * pool.length)];
+      }
+    }
+
+    const candidate = chars.join("");
+    if (
+      candidate.length >= 3 &&
+      candidate !== clean &&
+      !dictionary.has(candidate)
+    ) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Generate a DET-style pseudo-word by blending two real words.
+ * Example: "some" + "other" -> "somether"-like strings.
+ *
+ * Strategy:
+ * - Pick two different real words from the pool.
+ * - Take a prefix of the first and a suffix of the second.
+ * - Concatenate them.
+ * - Reject if the result is a real word or too similar/short.
+ */
+function makeBlendedPseudoWordFromPool(
+  pool: string[],
+  dictionary: Set<string>,
+  maxTries = 16
+): string | null {
+  if (pool.length < 2) return null;
+
+  for (let attempt = 0; attempt < maxTries; attempt += 1) {
+    const w1 = pool[Math.floor(Math.random() * pool.length)];
+    const w2 = pool[Math.floor(Math.random() * pool.length)];
+    if (!w1 || !w2 || w1 === w2) continue;
+
+    const a = normalizeWord(w1);
+    const b = normalizeWord(w2);
+    if (!isGoodCandidateWord(a) || !isGoodCandidateWord(b)) continue;
+
+    // Choose cut positions
+    // prefix length of first word
+    const minPrefix = Math.min(2, a.length - 1);
+    const maxPrefix = Math.max(minPrefix, Math.min(a.length - 1, 4));
+    const prefixLen =
+      minPrefix + Math.floor(Math.random() * (maxPrefix - minPrefix + 1));
+
+    // suffix start index of second word
+    const minSuffixStart = 1;
+    const maxSuffixStart = Math.max(
+      minSuffixStart,
+      Math.min(b.length - 2, 4)
+    );
+    const suffixStart =
+      minSuffixStart +
+      Math.floor(Math.random() * (maxSuffixStart - minSuffixStart + 1));
+
+    const prefix = a.slice(0, prefixLen);
+    const suffix = b.slice(suffixStart);
+    const candidate = (prefix + suffix).toLowerCase();
+
+    // Basic filters
+    if (candidate.length < 4) continue;
+    if (candidate === a || candidate === b) continue;
+    if (!/[aeiou]/.test(candidate)) continue; // must contain a vowel
+    if (!/^[a-z]+$/.test(candidate)) continue;
+    if (dictionary.has(candidate)) continue;
+
+    return candidate;
+  }
+
+  return null;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Problem set generation                                                      */
 /* -------------------------------------------------------------------------- */
@@ -394,11 +518,22 @@ function buildProblemSet(size: number, difficulty: Difficulty): Item[] {
     safety < targetSize * 40
   ) {
     safety += 1;
-    const src =
-      pseudoSource[Math.floor(Math.random() * pseudoSource.length)];
-    const candidate = makePseudoWord(src, dictionary);
+
+    let candidate: string | null = null;
+
+    // Prefer DET-like blends most of the time,
+    // but occasionally fall back to single-word mutation
+    if (Math.random() < 0.7) {
+      candidate = makeBlendedPseudoWordFromPool(pseudoSource, dictionary);
+    } else {
+      const src =
+        pseudoSource[Math.floor(Math.random() * pseudoSource.length)];
+      candidate = makeMutatedPseudoWord(src, dictionary);
+    }
+
     if (!candidate) continue;
     if (used.has(candidate)) continue;
+
     used.add(candidate);
     pseudoWords.push(candidate);
   }
