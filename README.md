@@ -6,11 +6,9 @@
 [![docker](https://github.com/europanite/det_vocabulary/actions/workflows/docker.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/docker.yml)
 [![GitHub Pages](https://github.com/europanite/det_vocabulary/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/deploy-pages.yml)
 
-A Duolingo English Test Vocabulary Section Playground.
+A Playground for the Vocabulary Section in **Duolingo English Test**.
 
 !["web_ui"](./assets/images/web_ui.png)
-<!-- !["phone_ui"](./assets/images/phone_ui.png) -->
-
 
 ## PlayGround
 

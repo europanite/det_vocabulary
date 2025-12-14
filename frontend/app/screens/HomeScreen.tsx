@@ -1032,6 +1032,11 @@ const HomeScreen: React.FC = () => {
               DET Vocabulary Practice
             </Text>
           </TouchableOpacity>
+          <View>
+            <Text>
+              A Playground for the Vocabulary Section in Duolingo English Test.
+            </Text>
+          </View>
           {/* Toolbar */}
           <View
             style={{
