@@ -1,5 +1,7 @@
 # [DET Vocabulary](https://github.com/europanite/det_vocabulary "DET Vocabulary")
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ![OS](https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows-blue)
 
 [![CI](https://github.com/europanite/det_vocabulary/actions/workflows/ci.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/ci.yml)
