@@ -1027,7 +1027,6 @@ const HomeScreen: React.FC = () => {
                 marginBottom: 12,
                 color: "#1d4ed8",
                 textDecorationLine: "underline",
-                underlined: true,
               }}
             >
               DET Vocabulary Practice
