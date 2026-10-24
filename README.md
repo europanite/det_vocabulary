@@ -1,10 +1,10 @@
-# [DET Vocabulary](https://github.com/europanite/det_vocabulary "DET Vocabulary")
+# [DET Vocabulary](https://github.com/europanite/det-vocabulary "DET Vocabulary")
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![OS](https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows-blue)
-[![CI](https://github.com/europanite/det_vocabulary/actions/workflows/ci.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/ci.yml)
-[![docker](https://github.com/europanite/det_vocabulary/actions/workflows/docker.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/docker.yml)
-[![GitHub Pages](https://github.com/europanite/det_vocabulary/actions/workflows/pages.yml/badge.svg)](https://github.com/europanite/det_vocabulary/actions/workflows/pages.yml)
+[![CI](https://github.com/europanite/det-vocabulary/actions/workflows/ci.yml/badge.svg)](https://github.com/europanite/det-vocabulary/actions/workflows/ci.yml)
+[![docker](https://github.com/europanite/det-vocabulary/actions/workflows/docker.yml/badge.svg)](https://github.com/europanite/det-vocabulary/actions/workflows/docker.yml)
+[![GitHub Pages](https://github.com/europanite/det-vocabulary/actions/workflows/pages.yml/badge.svg)](https://github.com/europanite/det-vocabulary/actions/workflows/pages.yml)
 
 ![React Native](https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
@@ -17,7 +17,7 @@ A Playground for the Vocabulary Section in **Duolingo English Test**.
 
 ## PlayGround
 
- [DET Vocabulary](https://europanite.github.io/det_vocabulary/)
+ [DET Vocabulary](https://europanite.github.io/det-vocabulary/)
 
 Select the real English words in this list.
 

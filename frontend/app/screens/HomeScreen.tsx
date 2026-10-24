@@ -997,7 +997,7 @@ const HomeScreen: React.FC = () => {
 
   /* ----- Render ------------------------------------------------------------ */
   const noData = items.length === 0;
-  const REPO_URL = "https://github.com/europanite/det_vocabulary";
+  const REPO_URL = "https://github.com/europanite/det-vocabulary";
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.bg }}>

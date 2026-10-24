@@ -1,6 +1,6 @@
-title: "det_vocabulary"
+title: "det-vocabulary"
 description: "A Duolingo English Test Vocabulary Section Playground."
-baseurl: "/det_vocabulary"
+baseurl: "/det-vocabulary"
 url: "https://europanite.github.io"
 theme: minima
 markdown: kramdown
