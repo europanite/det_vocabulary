@@ -23,7 +23,7 @@
       "edgeToEdgeEnabled": true
     },
     "experiments": {
-      "baseUrl": "/det_vocabulary"
+      "baseUrl": "/det-vocabulary"
     },
     "web": {
       "favicon": "./assets/favicon.png",
